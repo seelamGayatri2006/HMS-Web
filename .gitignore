@@ -1,0 +1,15 @@
+# Maven
+target/
+*.class
+
+# Application secrets
+application.properties
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db

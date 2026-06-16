@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HMS - Hospital Management System</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',sans-serif;background:#f8fafc;color:#0f172a;}
+.sidebar{width:230px;height:100vh;background:linear-gradient(180deg,#08143a,#0c2860);position:fixed;left:0;top:0;display:flex;flex-direction:column;}
+.sidebar-logo{padding:28px 22px 20px;border-bottom:1px solid rgba(255,255,255,0.1);}
+.sidebar-logo h1{color:#fff;font-size:22px;font-weight:700;}
+.sidebar-logo p{color:#7898d4;font-size:11px;margin-top:3px;}
+.sidebar-nav{flex:1;padding:10px 0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 22px;color:#bed7ff;font-size:13px;text-decoration:none;transition:all 0.2s;border-left:3px solid transparent;}
+.nav-item:hover{background:rgba(255,255,255,0.08);color:#fff;}
+.nav-item.active{background:rgba(255,255,255,0.15);color:#fff;border-left:3px solid #10b981;}
+.sidebar-user{padding:16px 22px;border-top:1px solid rgba(255,255,255,0.1);}
+.sidebar-user .name{color:#fff;font-size:13px;font-weight:600;}
+.sidebar-user .role{color:#7898d4;font-size:11px;margin-top:2px;}
+.logout-btn{display:inline-block;margin-top:10px;color:#ff7878;font-size:12px;text-decoration:none;}
+.logout-btn:hover{color:#ff4444;}
+.main{margin-left:230px;min-height:100vh;}
+.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.topbar h2{font-size:16px;font-weight:600;color:#0f172a;}
+.topbar .time{font-size:12px;color:#64748b;}
+.content{padding:24px;}
+.alert{padding:12px 16px;border-radius:8px;margin-bottom:20px;font-size:13px;}
+.alert-success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;}
+.alert-error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
+.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:20px;margin-bottom:20px;}
+.card-title{font-size:15px;font-weight:600;color:#0f172a;margin-bottom:16px;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;text-decoration:none;transition:all 0.2s;}
+.btn-primary{background:#0f52ba;color:#fff;} .btn-primary:hover{background:#0a3d8c;}
+.btn-success{background:#10b981;color:#fff;} .btn-success:hover{background:#059669;}
+.btn-danger{background:#ef4444;color:#fff;} .btn-danger:hover{background:#dc2626;}
+.btn-warning{background:#f59e0b;color:#fff;} .btn-warning:hover{background:#d97706;}
+.btn-outline{background:#fff;color:#0f52ba;border:1.5px solid #0f52ba;} .btn-outline:hover{background:#dbeafe;}
+.btn-sm{padding:5px 12px;font-size:12px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{background:#f8fafc;color:#64748b;font-weight:600;padding:12px 14px;text-align:left;border-bottom:2px solid #e2e8f0;}
+tbody tr{border-bottom:1px solid #f1f5f9;transition:background 0.15s;}
+tbody tr:hover{background:#f8fafc;}
+tbody td{padding:12px 14px;color:#0f172a;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-success{background:#d1fae5;color:#065f46;}
+.badge-danger{background:#fee2e2;color:#991b1b;}
+.badge-warning{background:#fef3c7;color:#92400e;}
+.badge-info{background:#dbeafe;color:#1e40af;}
+.badge-secondary{background:#f1f5f9;color:#475569;}
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;font-size:12px;font-weight:600;color:#64748b;margin-bottom:6px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;outline:none;transition:border 0.2s;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#6399ff;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:20px;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px;}
+.stat-card.blue::before{background:#0f52ba;} .stat-card.green::before{background:#10b981;}
+.stat-card.orange::before{background:#f59e0b;} .stat-card.purple::before{background:#8b5cf6;}
+.stat-card.pink::before{background:#ec4899;}
+.stat-value{font-size:32px;font-weight:700;margin-bottom:4px;}
+.stat-card.blue .stat-value{color:#0f52ba;} .stat-card.green .stat-value{color:#10b981;}
+.stat-card.orange .stat-value{color:#f59e0b;} .stat-card.purple .stat-value{color:#8b5cf6;}
+.stat-card.pink .stat-value{color:#ec4899;}
+.stat-label{font-size:13px;font-weight:600;color:#0f172a;}
+.stat-sub{font-size:11px;color:#94a3b8;margin-top:2px;}
+.search-bar{display:flex;gap:8px;margin-bottom:16px;}
+.search-bar input{flex:1;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;}
+.search-bar input:focus{border-color:#6399ff;}
+.top-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <h1>+ HMS</h1>
+    <p>Hospital Management</p>
+  </div>
+  <nav class="sidebar-nav">
+    <a th:href="@{/dashboard}"    class="nav-item" th:classappend="${activePage=='dashboard'?'active':''}">🏠 Dashboard</a>
+    <a th:href="@{/patients}"     class="nav-item" th:classappend="${activePage=='patients'?'active':''}">👤 Patients</a>
+    <a th:href="@{/doctors}"      class="nav-item" th:classappend="${activePage=='doctors'?'active':''}">👨‍⚕️ Doctors</a>
+    <a th:href="@{/appointments}" class="nav-item" th:classappend="${activePage=='appointments'?'active':''}">📅 Appointments</a>
+    <a th:href="@{/billing}"      class="nav-item" th:classappend="${activePage=='billing'?'active':''}">🧾 Billing</a>
+    <a th:href="@{/medicines}"    class="nav-item" th:classappend="${activePage=='medicines'?'active':''}">💊 Medicine</a>
+    <a th:href="@{/rooms}"        class="nav-item" th:classappend="${activePage=='rooms'?'active':''}">🛏 Rooms</a>
+    <a th:href="@{/reports}"      class="nav-item" th:classappend="${activePage=='reports'?'active':''}">📊 Reports</a>
+    <a th:href="@{/users}" sec:authorize="hasAuthority('ADMIN')" class="nav-item" th:classappend="${activePage=='users'?'active':''}">👥 Users</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="name" sec:authentication="name">User</div>
+    <div class="role">Logged in</div>
+    <a th:href="@{/logout}" class="logout-btn">⏻ Logout</a>
+  </div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <h2 th:text="${pageTitle}">Page</h2>
+    <span class="time" id="clock"></span>
+  </div>
+  <div class="content" th:fragment="content"><!-- page content here --></div>
+</div>
+<script>
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString();}
+setInterval(updateClock,1000); updateClock();
+</script>
+</body>
+</html>

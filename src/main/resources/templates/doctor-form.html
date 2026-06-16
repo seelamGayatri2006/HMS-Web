@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><title>HMS - Doctor Form</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',sans-serif;background:#f8fafc;}.sidebar{width:230px;height:100vh;background:linear-gradient(180deg,#08143a,#0c2860);position:fixed;left:0;top:0;display:flex;flex-direction:column;}.sidebar-logo{padding:28px 22px 20px;border-bottom:1px solid rgba(255,255,255,0.1);}.sidebar-logo h1{color:#fff;font-size:22px;font-weight:700;}.sidebar-logo p{color:#7898d4;font-size:11px;margin-top:3px;}.nav-item{display:flex;align-items:center;padding:11px 22px;color:#bed7ff;font-size:13px;text-decoration:none;border-left:3px solid transparent;}.nav-item:hover,.nav-item.active{background:rgba(255,255,255,0.12);color:#fff;border-left:3px solid #10b981;}.sidebar-user{padding:16px 22px;border-top:1px solid rgba(255,255,255,0.1);}.sidebar-user .name{color:#fff;font-size:13px;font-weight:600;}.sidebar-user .role{color:#7898d4;font-size:11px;}.logout-btn{display:inline-block;margin-top:10px;color:#ff7878;font-size:12px;text-decoration:none;}.main{margin-left:230px;}.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}.topbar h2{font-size:16px;font-weight:600;}.topbar .time{font-size:12px;color:#64748b;}.content{padding:24px;}.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:28px;max-width:700px;}.card-title{font-size:15px;font-weight:600;color:#0f172a;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid #e2e8f0;}.form-group{margin-bottom:16px;}.form-group label{display:block;font-size:12px;font-weight:600;color:#64748b;margin-bottom:6px;}.form-group input,.form-group select{width:100%;padding:10px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;outline:none;transition:border 0.2s;}.form-group input:focus,.form-group select:focus{border-color:#6399ff;}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}.form-actions{display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e2e8f0;}.btn{display:inline-flex;align-items:center;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;text-decoration:none;gap:6px;}.btn-primary{background:#0f52ba;color:#fff;}.btn-outline{background:#fff;color:#0f52ba;border:1.5px solid #0f52ba;}</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-logo"><h1>+ HMS</h1><p>Hospital Management</p></div>
+  <nav style="flex:1;padding:10px 0;">
+    <a href="/dashboard" class="nav-item">🏠 Dashboard</a>
+    <a href="/patients" class="nav-item">👤 Patients</a>
+    <a href="/doctors" class="nav-item active">👨‍⚕️ Doctors</a>
+    <a href="/appointments" class="nav-item">📅 Appointments</a>
+    <a href="/billing" class="nav-item">🧾 Billing</a>
+    <a href="/medicines" class="nav-item">💊 Medicine</a>
+    <a href="/rooms" class="nav-item">🛏 Rooms</a>
+    <a href="/reports" class="nav-item">📊 Reports</a>
+    <a href="/users" th:if="${isAdmin}" class="nav-item">👥 Users</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="name" th:text="${loggedInUser}">Admin</div>
+    <div class="role" th:text="${isAdmin} ? 'ADMIN' : (${isDoctor} ? 'DOCTOR' : 'RECEPTIONIST')">Role</div>
+    <a href="/logout" class="logout-btn">⏻ Logout</a>
+  </div>
+</div>
+<div class="main">
+<div class="topbar"><h2 th:text="${doctor != null} ? 'Edit Doctor' : 'Add Doctor'">Doctor Form</h2><span class="time" id="clock"></span></div>
+<div class="content">
+  <div class="card">
+    <div class="card-title">👨‍⚕️ Doctor Details</div>
+    <form action="/doctors/save" method="post">
+      <input type="hidden" name="doctorId" th:value="${doctor?.doctor_id}"/>
+      <div class="form-row">
+        <div class="form-group"><label>Full Name *</label><input type="text" name="fullName" th:value="${doctor?.full_name}" required placeholder="Dr. John Smith"/></div>
+        <div class="form-group"><label>Specialisation *</label><input type="text" name="specialisation" th:value="${doctor?.specialisation}" required placeholder="Cardiology"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Qualification</label><input type="text" name="qualification" th:value="${doctor?.qualification}" placeholder="MBBS, MD"/></div>
+        <div class="form-group"><label>Phone</label><input type="text" name="phone" th:value="${doctor?.phone}" placeholder="9876543210"/></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Email</label><input type="email" name="email" th:value="${doctor?.email}" placeholder="doctor@hms.com"/></div>
+        <div class="form-group"><label>Consultation Fee (₹)</label><input type="number" name="consultationFee" th:value="${doctor?.consultation_fee}" placeholder="500" step="0.01"/></div>
+      </div>
+      <div class="form-group"><label>Available Days</label><input type="text" name="availableDays" th:value="${doctor?.available_days}" placeholder="MON,TUE,WED,THU,FRI"/></div>
+      <div class="form-row">
+        <div class="form-group"><label>Available From</label><input type="time" name="availableFrom" th:value="${doctor?.available_from}" value="09:00"/></div>
+        <div class="form-group"><label>Available To</label><input type="time" name="availableTo" th:value="${doctor?.available_to}" value="17:00"/></div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">💾 Save Doctor</button>
+        <a href="/doctors" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
+<script>function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString();}setInterval(updateClock,1000);updateClock();</script>
+</body></html>

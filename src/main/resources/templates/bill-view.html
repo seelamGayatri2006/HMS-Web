@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><title>HMS - Bill View</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',sans-serif;background:#f8fafc;}.sidebar{width:230px;height:100vh;background:linear-gradient(180deg,#08143a,#0c2860);position:fixed;left:0;top:0;display:flex;flex-direction:column;}.sidebar-logo{padding:28px 22px 20px;border-bottom:1px solid rgba(255,255,255,0.1);}.sidebar-logo h1{color:#fff;font-size:22px;font-weight:700;}.sidebar-logo p{color:#7898d4;font-size:11px;margin-top:3px;}.nav-item{display:flex;align-items:center;padding:11px 22px;color:#bed7ff;font-size:13px;text-decoration:none;border-left:3px solid transparent;}.nav-item:hover,.nav-item.active{background:rgba(255,255,255,0.12);color:#fff;border-left:3px solid #10b981;}.sidebar-user{padding:16px 22px;border-top:1px solid rgba(255,255,255,0.1);}.sidebar-user .name{color:#fff;font-size:13px;font-weight:600;}.sidebar-user .role{color:#7898d4;font-size:11px;}.logout-btn{display:inline-block;margin-top:10px;color:#ff7878;font-size:12px;text-decoration:none;}.main{margin-left:230px;}.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}.topbar h2{font-size:16px;font-weight:600;}.topbar .time{font-size:12px;color:#64748b;}.content{padding:24px;}.invoice{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:32px;max-width:750px;}.invoice-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:20px;border-bottom:2px solid #e2e8f0;}.invoice-title{font-size:28px;font-weight:700;color:#0f52ba;}.invoice-sub{font-size:12px;color:#64748b;margin-top:4px;}.invoice-info{text-align:right;font-size:13px;}.invoice-info p{color:#64748b;margin-bottom:4px;}.invoice-info span{font-weight:600;color:#0f172a;}.patient-section{background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:24px;}.patient-section h4{font-size:12px;font-weight:600;color:#64748b;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;}.patient-section p{font-size:14px;font-weight:600;color:#0f172a;}.items-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px;}.items-table th{background:#f8fafc;padding:10px 14px;text-align:left;font-weight:600;color:#64748b;border-bottom:2px solid #e2e8f0;}.items-table td{padding:10px 14px;border-bottom:1px solid #f1f5f9;}.totals{display:flex;justify-content:flex-end;}.totals-box{width:280px;}.total-row{display:flex;justify-content:space-between;padding:8px 0;font-size:13px;border-bottom:1px solid #f1f5f9;}.total-row.final{font-size:16px;font-weight:700;color:#0f52ba;border-bottom:none;padding-top:12px;}.total-row .label{color:#64748b;}.payment-section{margin-top:24px;padding-top:20px;border-top:1px solid #e2e8f0;}.payment-section h4{font-size:13px;font-weight:600;margin-bottom:12px;}.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;margin-left:8px;}.badge-success{background:#d1fae5;color:#065f46;}.badge-danger{background:#fee2e2;color:#991b1b;}.badge-warning{background:#fef3c7;color:#92400e;}.btn{display:inline-flex;align-items:center;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;text-decoration:none;gap:6px;margin-right:8px;}.btn-success{background:#10b981;color:#fff;}.btn-outline{background:#fff;color:#0f52ba;border:1.5px solid #0f52ba;}.pay-form{display:flex;gap:8px;align-items:flex-end;margin-top:12px;flex-wrap:wrap;}.pay-form label{font-size:12px;font-weight:600;color:#64748b;display:block;margin-bottom:4px;}.pay-form input,.pay-form select{padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;}.alert{padding:12px 16px;border-radius:8px;margin-bottom:20px;font-size:13px;}.alert-success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;}</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-logo"><h1>+ HMS</h1><p>Hospital Management</p></div>
+  <nav style="flex:1;padding:10px 0;">
+    <a href="/dashboard" class="nav-item">🏠 Dashboard</a>
+    <a href="/patients" class="nav-item">👤 Patients</a>
+    <a href="/doctors" class="nav-item">👨‍⚕️ Doctors</a>
+    <a href="/appointments" class="nav-item">📅 Appointments</a>
+    <a href="/billing" class="nav-item active">🧾 Billing</a>
+    <a href="/medicines" class="nav-item">💊 Medicine</a>
+    <a href="/rooms" class="nav-item">🛏 Rooms</a>
+    <a href="/reports" class="nav-item">📊 Reports</a>
+    <a href="/users" th:if="${isAdmin}" class="nav-item">👥 Users</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="name" th:text="${loggedInUser}">Admin</div>
+    <div class="role" th:text="${isAdmin} ? 'ADMIN' : (${isDoctor} ? 'DOCTOR' : 'RECEPTIONIST')">Role</div>
+    <a href="/logout" class="logout-btn">⏻ Logout</a>
+  </div>
+</div>
+<div class="main">
+<div class="topbar"><h2>Bill Details</h2><span class="time" id="clock"></span></div>
+<div class="content">
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div class="invoice">
+    <div class="invoice-header">
+      <div>
+        <div class="invoice-title">INVOICE</div>
+        <div class="invoice-sub">+ HMS Hospital Management System</div>
+      </div>
+      <div class="invoice-info">
+        <p>Bill #<span th:text="${bill.bill_id}"></span></p>
+        <p>Date: <span th:text="${bill.bill_date}"></span></p>
+        <p>Status:
+          <span class="badge"
+            th:classappend="${bill.payment_status=='PAID'?'badge-success':bill.payment_status=='PENDING'?'badge-danger':'badge-warning'}"
+            th:text="${bill.payment_status}"></span>
+        </p>
+      </div>
+    </div>
+
+    <div class="patient-section">
+      <h4>Patient</h4>
+      <p th:text="${bill.patient_name}"></p>
+    </div>
+
+    <table class="items-table">
+      <thead><tr><th>Description</th><th>Category</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
+      <tbody>
+        <tr th:each="item : ${items}">
+          <td th:text="${item.description}"></td>
+          <td th:text="${item.category}"></td>
+          <td th:text="${item.quantity}"></td>
+          <td th:text="'₹' + ${item.unit_price}"></td>
+          <td th:text="'₹' + ${item.unit_price * item.quantity}"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="totals">
+      <div class="totals-box">
+        <div class="total-row"><span class="label">Subtotal</span><span th:text="'₹' + ${bill.subtotal}"></span></div>
+        <div class="total-row"><span class="label">Discount</span><span th:text="'₹' + ${bill.discount}"></span></div>
+        <div class="total-row"><span class="label">GST (18%)</span><span th:text="'₹' + ${bill.tax}"></span></div>
+        <div class="total-row final"><span class="label">Total</span><span th:text="'₹' + ${bill.total_amount}"></span></div>
+        <div class="total-row"><span class="label">Paid</span><span style="color:#10b981;" th:text="'₹' + ${bill.paid_amount}"></span></div>
+        <div class="total-row"><span class="label">Balance Due</span><span style="color:#ef4444;" th:text="'₹' + (${bill.total_amount} - ${bill.paid_amount})"></span></div>
+      </div>
+    </div>
+
+    <div class="payment-section" th:if="${bill.payment_status != 'PAID'}">
+      <h4>💳 Record Payment</h4>
+      <form th:action="@{/billing/pay/{id}(id=${bill.bill_id})}" method="post" class="pay-form">
+        <div>
+          <label>Amount (₹)</label>
+          <input type="number" name="amount" step="0.01" th:value="${bill.total_amount - bill.paid_amount}" required/>
+        </div>
+        <div>
+          <label>Payment Method</label>
+          <select name="method">
+            <option value="CASH">Cash</option>
+            <option value="CARD">Card</option>
+            <option value="UPI">UPI</option>
+            <option value="INSURANCE">Insurance</option>
+          </select>
+        </div>
+        <div style="padding-top:20px;">
+          <button type="submit" class="btn btn-success">✅ Record Payment</button>
+        </div>
+      </form>
+    </div>
+
+    <div style="margin-top:20px;">
+      <a href="/billing" class="btn btn-outline">← Back to Bills</a>
+    </div>
+  </div>
+</div>
+</div>
+<script>function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString();}setInterval(updateClock,1000);updateClock();</script>
+</body></html>

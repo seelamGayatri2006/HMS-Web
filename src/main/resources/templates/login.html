@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<title>HMS Login</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',sans-serif;display:flex;min-height:100vh;}
+.left{width:420px;background:linear-gradient(135deg,#08193f,#1450b4);display:flex;align-items:center;justify-content:center;flex-direction:column;padding:44px;position:relative;overflow:hidden;}
+.left::before{content:'';position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(99,155,255,0.25),transparent);top:-60px;left:-60px;}
+.left::after{content:'';position:absolute;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(16,185,129,0.2),transparent);bottom:-40px;right:-40px;}
+.left-inner{text-align:center;z-index:1;}
+.left-plus{font-size:56px;font-weight:900;color:#63c8ff;line-height:1;}
+.left-title{font-size:52px;font-weight:900;color:#fff;line-height:1;}
+.left-line{width:60px;height:4px;background:#10b981;border-radius:4px;margin:16px auto;}
+.left-sub{color:#a0c8ff;font-size:14px;}
+.left-stats{display:flex;gap:32px;margin-top:36px;}
+.stat{text-align:center;}
+.stat-val{font-size:24px;font-weight:700;color:#63c8ff;}
+.stat-lbl{font-size:11px;color:#7898d4;}
+.left-ver{margin-top:36px;font-size:11px;color:#5070a0;}
+.right{flex:1;background:#f8fafc;display:flex;align-items:center;justify-content:center;}
+.card{background:#fff;border-radius:16px;padding:44px;width:400px;box-shadow:0 8px 30px rgba(0,0,0,0.08);}
+.badge{display:inline-block;background:#dbeafe;color:#1e40af;font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;margin-bottom:20px;}
+.card h2{font-size:26px;font-weight:700;color:#0f172a;margin-bottom:4px;}
+.card p{font-size:13px;color:#64748b;margin-bottom:32px;}
+.form-group{margin-bottom:18px;}
+.form-group label{display:block;font-size:12px;font-weight:600;color:#64748b;margin-bottom:6px;}
+.form-group input{width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;transition:border 0.2s;}
+.form-group input:focus{border-color:#6399ff;}
+.btn-login{width:100%;padding:12px;background:#0f52ba;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:background 0.2s;}
+.btn-login:hover{background:#0a3d8c;}
+.error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;}
+</style>
+</head>
+<body>
+<div class="left">
+  <div class="left-inner">
+    <div class="left-plus">+</div>
+    <div class="left-title">HMS</div>
+    <div class="left-line"></div>
+    <div class="left-sub">Hospital Management System</div>
+    <div class="left-stats">
+      <div class="stat"><div class="stat-val">∞</div><div class="stat-lbl">Patients</div></div>
+      <div class="stat"><div class="stat-val">∞</div><div class="stat-lbl">Doctors</div></div>
+      <div class="stat"><div class="stat-val">11</div><div class="stat-lbl">Rooms</div></div>
+    </div>
+    <div class="left-ver">v2.0 Advanced Edition</div>
+  </div>
+</div>
+<div class="right">
+  <div class="card">
+    <div class="badge">SECURE LOGIN</div>
+    <h2>Welcome back</h2>
+    <p>Sign in to your HMS dashboard</p>
+    <div class="error" th:if="${param.error}">Invalid username or password.</div>
+    <div class="error" th:if="${param.logout}" style="background:#d1fae5;color:#065f46;border-color:#6ee7b7;">Logged out successfully.</div>
+    <form th:action="@{/login}" method="post">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="Enter username" required autofocus/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Enter password" required/>
+      </div>
+      <button class="btn-login" type="submit">Sign In →</button>
+      <div style="margin-top:16px;background:#95a1a8;border:1px solid #bae6fd;border-radius:8px;padding:12px 16px;">
+  <p style="font-size:12px;font-weight:700;color:#0369a1;margin-bottom:8px;">Login:</p>
+  <p style="font-size:13px;color:#0f172a;">Username: <strong>viewer</strong></p>
+  <p style="font-size:13px;color:#0f172a;">Password: <strong>viewer123</strong></p>
+</div>
+    </form>
+  </div>
+</div>
+</body>
+</html>

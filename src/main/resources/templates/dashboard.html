@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<title>HMS - Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',sans-serif;background:#f8fafc;}
+.sidebar{width:230px;height:100vh;background:linear-gradient(180deg,#08143a,#0c2860);position:fixed;left:0;top:0;display:flex;flex-direction:column;}
+.sidebar-logo{padding:28px 22px 20px;border-bottom:1px solid rgba(255,255,255,0.1);}
+.sidebar-logo h1{color:#fff;font-size:22px;font-weight:700;}
+.sidebar-logo p{color:#7898d4;font-size:11px;margin-top:3px;}
+.nav-item{display:flex;align-items:center;padding:11px 22px;color:#bed7ff;font-size:13px;text-decoration:none;border-left:3px solid transparent;}
+.nav-item:hover,.nav-item.active{background:rgba(255,255,255,0.12);color:#fff;border-left:3px solid #10b981;}
+.sidebar-user{padding:16px 22px;border-top:1px solid rgba(255,255,255,0.1);}
+.sidebar-user .name{color:#fff;font-size:13px;font-weight:600;}
+.sidebar-user .role{color:#7898d4;font-size:11px;}
+.logout-btn{display:inline-block;margin-top:10px;color:#ff7878;font-size:12px;text-decoration:none;}
+.main{margin-left:230px;}
+.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}
+.topbar h2{font-size:16px;font-weight:600;}
+.topbar .time{font-size:12px;color:#64748b;}
+.content{padding:24px;}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:20px;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;}
+.stat-card.blue::before{background:#0f52ba;}
+.stat-card.green::before{background:#10b981;}
+.stat-card.orange::before{background:#f59e0b;}
+.stat-card.purple::before{background:#8b5cf6;}
+.stat-value{font-size:32px;font-weight:700;margin-bottom:4px;}
+.stat-card.blue .stat-value{color:#0f52ba;}
+.stat-card.green .stat-value{color:#10b981;}
+.stat-card.orange .stat-value{color:#f59e0b;}
+.stat-card.purple .stat-value{color:#8b5cf6;}
+.stat-label{font-size:13px;font-weight:600;color:#0f172a;}
+.stat-sub{font-size:11px;color:#94a3b8;margin-top:2px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:20px;}
+.card-title{font-size:15px;font-weight:600;color:#0f172a;margin-bottom:16px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{background:#f8fafc;color:#64748b;font-weight:600;padding:10px 14px;text-align:left;border-bottom:2px solid #e2e8f0;}
+tbody td{padding:10px 14px;border-bottom:1px solid #f1f5f9;}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-info{background:#dbeafe;color:#1e40af;}
+.badge-success{background:#d1fae5;color:#065f46;}
+.badge-danger{background:#fee2e2;color:#991b1b;}
+.welcome-card{background:linear-gradient(135deg,#0f52ba,#3a82f7);border-radius:12px;padding:28px;color:#fff;}
+.welcome-card h3{font-size:20px;font-weight:700;margin-bottom:8px;}
+.welcome-card p{font-size:13px;opacity:0.85;line-height:1.8;}
+.revenue-badge{display:inline-block;background:rgba(255,255,255,0.2);color:#fff;padding:6px 16px;border-radius:20px;font-size:12px;font-weight:600;margin-top:16px;}
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-logo"><h1>+ HMS</h1><p>Hospital Management</p></div>
+  <nav style="flex:1;padding:10px 0;">
+    <a href="/dashboard" class="nav-item active">🏠 Dashboard</a>
+    <a href="/patients" class="nav-item">👤 Patients</a>
+    <a href="/doctors" class="nav-item">👨‍⚕️ Doctors</a>
+    <a href="/appointments" class="nav-item">📅 Appointments</a>
+    <a href="/billing" class="nav-item">🧾 Billing</a>
+    <a href="/medicines" class="nav-item">💊 Medicine</a>
+    <a href="/rooms" class="nav-item">🛏 Rooms</a>
+    <a href="/reports" class="nav-item">📊 Reports</a>
+    <a href="/users" th:if="${isAdmin}" class="nav-item">👥 Users</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="name" th:text="${loggedInUser}">Admin</div>
+    <div class="role" th:text="${isAdmin} ? 'ADMIN' : (${isDoctor} ? 'DOCTOR' : 'RECEPTIONIST')">Role</div>
+    <a href="/logout" class="logout-btn">⏻ Logout</a>
+  </div>
+</div>
+<div class="main">
+  <div class="topbar">
+    <h2>Dashboard</h2>
+    <span class="time" id="clock"></span>
+  </div>
+  <div class="content">
+
+    <div class="stat-grid">
+      <div class="stat-card blue">
+        <div class="stat-value" th:text="${totalPatients}">0</div>
+        <div class="stat-label">Total Patients</div>
+        <div class="stat-sub">Registered</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-value" th:text="${totalDoctors}">0</div>
+        <div class="stat-label">Total Doctors</div>
+        <div class="stat-sub">Active</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-value" th:text="${totalAppointments}">0</div>
+        <div class="stat-label">Appointments</div>
+        <div class="stat-sub">All time</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-value" th:text="${availableRooms}">0</div>
+        <div class="stat-label">Rooms Available</div>
+        <div class="stat-sub">Ready</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">📅 Today's Appointments</div>
+        <table>
+          <thead>
+            <tr><th>Patient</th><th>Doctor</th><th>Time</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr th:each="a : ${todayAppointments}">
+              <td th:text="${a.patient_name}">-</td>
+              <td th:text="${a.doctor_name}">-</td>
+              <td th:text="${a.appt_time}">-</td>
+              <td>
+                <span class="badge"
+                  th:classappend="${a.status == 'SCHEDULED'} ? 'badge-info' : (${a.status == 'COMPLETED'} ? 'badge-success' : 'badge-danger')"
+                  th:text="${a.status}">-</span>
+              </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(todayAppointments)}">
+              <td colspan="4" style="text-align:center;color:#94a3b8;padding:20px;">No appointments today</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="welcome-card">
+        <h3>🏥 Welcome to HMS</h3>
+        <p>
+          ✅ Patient Registration and Management<br/>
+          ✅ Doctor and Appointment Management<br/>
+          ✅ Billing and Invoice Generation<br/>
+          ✅ Medicine Inventory Management<br/>
+          ✅ Room and Bed Management<br/>
+          ✅ Reports and Analytics
+        </p>
+        <div class="revenue-badge">
+          💰 Total Revenue: ₹<span th:text="${totalRevenue}">0</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<script>
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString();}
+setInterval(updateClock,1000); updateClock();
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"/><title>HMS - Rooms</title>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',sans-serif;background:#f8fafc;}.sidebar{width:230px;height:100vh;background:linear-gradient(180deg,#08143a,#0c2860);position:fixed;left:0;top:0;display:flex;flex-direction:column;}.sidebar-logo{padding:28px 22px 20px;border-bottom:1px solid rgba(255,255,255,0.1);}.sidebar-logo h1{color:#fff;font-size:22px;font-weight:700;}.sidebar-logo p{color:#7898d4;font-size:11px;margin-top:3px;}.nav-item{display:flex;align-items:center;padding:11px 22px;color:#bed7ff;font-size:13px;text-decoration:none;border-left:3px solid transparent;}.nav-item:hover,.nav-item.active{background:rgba(255,255,255,0.12);color:#fff;border-left:3px solid #10b981;}.sidebar-user{padding:16px 22px;border-top:1px solid rgba(255,255,255,0.1);}.sidebar-user .name{color:#fff;font-size:13px;font-weight:600;}.sidebar-user .role{color:#7898d4;font-size:11px;}.logout-btn{display:inline-block;margin-top:10px;color:#ff7878;font-size:12px;text-decoration:none;}.main{margin-left:230px;}.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;}.topbar h2{font-size:16px;font-weight:600;}.topbar .time{font-size:12px;color:#64748b;}.content{padding:24px;}.alert{padding:12px 16px;border-radius:8px;margin-bottom:20px;font-size:13px;}.alert-success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;}.alert-error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}.card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:20px;margin-bottom:20px;}.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}.stat-mini{background:#fff;border-radius:10px;border:1px solid #e2e8f0;padding:16px;text-align:center;}.stat-mini .val{font-size:28px;font-weight:700;}.stat-mini .lbl{font-size:12px;color:#64748b;margin-top:4px;}.btn{display:inline-flex;align-items:center;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;border:none;cursor:pointer;text-decoration:none;gap:6px;}.btn-primary{background:#0f52ba;color:#fff;}.btn-success{background:#10b981;color:#fff;}.btn-danger{background:#ef4444;color:#fff;}.btn-sm{padding:5px 12px;font-size:12px;}table{width:100%;border-collapse:collapse;font-size:13px;}thead th{background:#f8fafc;color:#64748b;font-weight:600;padding:12px 14px;text-align:left;border-bottom:2px solid #e2e8f0;}tbody tr{border-bottom:1px solid #f1f5f9;}tbody tr:hover{background:#f8fafc;}tbody td{padding:12px 14px;}.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}.badge-success{background:#d1fae5;color:#065f46;}.badge-danger{background:#fee2e2;color:#991b1b;}.badge-warning{background:#fef3c7;color:#92400e;}.top-actions{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-logo"><h1>+ HMS</h1><p>Hospital Management</p></div>
+  <nav style="flex:1;padding:10px 0;">
+    <a href="/dashboard" class="nav-item">🏠 Dashboard</a>
+    <a href="/patients" class="nav-item">👤 Patients</a>
+    <a href="/doctors" class="nav-item">👨‍⚕️ Doctors</a>
+    <a href="/appointments" class="nav-item">📅 Appointments</a>
+    <a href="/billing" class="nav-item">🧾 Billing</a>
+    <a href="/medicines" class="nav-item">💊 Medicine</a>
+    <a href="/rooms" class="nav-item active">🛏 Rooms</a>
+    <a href="/reports" class="nav-item">📊 Reports</a>
+    <a href="/users" th:if="${isAdmin}" class="nav-item">👥 Users</a>
+  </nav>
+  <div class="sidebar-user">
+    <div class="name" th:text="${loggedInUser}">Admin</div>
+    <div class="role" th:text="${isAdmin} ? 'ADMIN' : (${isDoctor} ? 'DOCTOR' : 'RECEPTIONIST')">Role</div>
+    <a href="/logout" class="logout-btn">⏻ Logout</a>
+  </div>
+</div>
+<div class="main">
+<div class="topbar"><h2>Room &amp; Bed Management</h2><span class="time" id="clock"></span></div>
+<div class="content">
+  <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+  <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+  <div class="stat-row">
+    <div class="stat-mini"><div class="val" style="color:#10b981;" th:text="${availableCount}">0</div><div class="lbl">Available Rooms</div></div>
+    <div class="stat-mini"><div class="val" style="color:#ef4444;" th:text="${occupiedCount}">0</div><div class="lbl">Occupied Rooms</div></div>
+  </div>
+  <div class="card">
+    <div class="top-actions">
+      <span style="font-size:13px;color:#64748b;">All Rooms</span>
+      <a th:if="${isAdmin}" href="/rooms/add" class="btn btn-primary">+ Add Room</a>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Room No</th><th>Type</th><th>Floor</th><th>Price/Day</th>
+          <th>Status</th><th>Patient</th><th>Admitted</th>
+          <th th:if="${isAdmin}">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="r : ${rooms}">
+          <td th:text="${r.room_id}"></td>
+          <td th:text="${r.room_number}"></td>
+          <td th:text="${r.room_type}"></td>
+          <td th:text="${r.floor}"></td>
+          <td th:text="'₹' + ${r.price_per_day}"></td>
+          <td>
+            <span class="badge"
+              th:classappend="${r.status=='AVAILABLE'?'badge-success':r.status=='OCCUPIED'?'badge-danger':'badge-warning'}"
+              th:text="${r.status}"></span>
+          </td>
+          <td th:text="${r.patient_name != null ? r.patient_name : '—'}"></td>
+          <td th:text="${r.admitted_at != null ? r.admitted_at : '—'}"></td>
+          <td th:if="${isAdmin}">
+            <a th:if="${r.status=='AVAILABLE'}" th:href="@{/rooms/assign/{id}(id=${r.room_id})}" class="btn btn-success btn-sm">Assign</a>
+            <a th:if="${r.status=='OCCUPIED'}" th:href="@{/rooms/discharge/{id}(id=${r.room_id})}" class="btn btn-danger btn-sm" onclick="return confirm('Discharge?')">Discharge</a>
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(rooms)}">
+          <td colspan="9" style="text-align:center;color:#94a3b8;padding:20px;">No rooms found</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+<script>function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString();}setInterval(updateClock,1000);updateClock();</script>
+</body>
+</html>
