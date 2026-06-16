@@ -2,8 +2,7 @@
 target/
 *.class
 
-# Application secrets
-application.properties
+
 
 # IDE
 .vscode/
